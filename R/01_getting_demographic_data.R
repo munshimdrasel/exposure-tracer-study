@@ -1,5 +1,5 @@
 
-#script_01: demographic and income data from 2013-2019 upto block group level for all states in US
+#script_01- part 01: demographic and income data from 2013-2019 upto block group level for all states in US
 
 library(downloader)
 library(tidyverse)
@@ -18,10 +18,10 @@ library( ncdf4)
 options(tigris_use_cache = TRUE)
 options(tigris_class = "sf")
 
-#on my PC
+#working directory on my PC
 # setwd ("/Users/munshirasel/Library/CloudStorage/GoogleDrive-munshimdrasel@gwmail.gwu.edu/My Drive/R/exposure-tracer-study")
 
-#on Hopper cluster
+#working directory on Hopper cluster
 setwd ("/projects/HAQ_LAB/mrasel/R/exposure-tracer-study")
 
 #demographic variables list
@@ -64,9 +64,10 @@ med_household_income <- c( med_household_income = "B19013_001",
                            hispanic_med_household_income="B19013I_001E")
 
 
+#creating loop to get demographic data upto block group levels
+
 df.list <- list()
 
-#getting demographic data upto block group levels
 for (i in 1:length(years)) {
   for (j in 1:length(states.vec)) {
     
@@ -102,7 +103,7 @@ for (i in 1:length(years)) {
 }
 
 
-#combining demographic data for all years 2013-2019
+#combining demographic data for all years 
 
 all.files = as.vector(list.files(path = paste0("./data/demographic_data"),   pattern = "*.RData",  full.names = TRUE))
 
