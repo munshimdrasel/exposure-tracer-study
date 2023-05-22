@@ -1,26 +1,23 @@
 # Script 02: inverse distance exposure calculation
 
-
-library(fst)
 library( sf)
-library( raster)
 library( data.table)
 library( ggplot2)
-library(tidycensus, quietly = TRUE)
 library(tidyverse)
 library(tigris, quietly = TRUE)
 library(viridis, quietly = TRUE)
 library(knitr, quietly = TRUE)
 library(scales, quietly = TRUE)
-# library(kableExtra, quietly = TRUE)
 library( fasterize)
 library( USAboundaries)
 library( magrittr)
-options(tigris_use_cache = TRUE)
-options(tigris_class = "sf")
 
-# setwd("/Users/munshirasel/Library/CloudStorage/GoogleDrive-munshimdrasel@gwmail.gwu.edu/My Drive/R/exposure-tracer-study")
-setwd("/projects/HAQ_LAB/mrasel/R/exposure-tracer-study")
+
+#working directory on my PC
+setwd ("/Users/munshirasel/Library/CloudStorage/GoogleDrive-munshimdrasel@gwmail.gwu.edu/My Drive/R/exposure-tracer-study")
+
+#working directory on Hopper cluster
+# setwd ("/projects/HAQ_LAB/mrasel/R/exposure-tracer-study")
 
 # steps:
 # 1. create spatial object of sources
@@ -41,14 +38,11 @@ setwd("/projects/HAQ_LAB/mrasel/R/exposure-tracer-study")
 # see information here: https://docs.qgis.org/2.8/en/docs/gentle_gis_introduction/coordinate_reference_systems.html#:~:text=A%20coordinate%20reference%20system%20(CRS,real%20places%20on%20the%20earth.
 ## =============================================================
 
-# =========================================================================================
 
+
+# ======================================================================================================
 # PART 01 Quantifying inverse distance exposure for different well types
-
-# =========================================================================================
-
-
-
+# ======================================================================================================
 
 #getting well data from Frack Tracker website
 # https://app.box.com/s/i7w2tm3tlp4fqmoe3pzelyjx5gbjj2lk/file/904886023237
@@ -57,8 +51,6 @@ well.data <- read.csv("./data/FracTrackerNationalWellFile_2021/FracTrackerNation
 
 # removing duplicated rows
 well.data <- well.data %>% distinct()
-
-unique(well.data$Type)
 
 oil.gas.well <- well.data #%>% filter( Type %in% c("Storage from Oil / Gas"))
 oil.gas.well$ID <- 1:nrow(oil.gas.well)
@@ -130,7 +122,7 @@ link_locations.sf.trans <- st_transform( link_locations.sf.trans , crs = p4s)
 # provide an output message
 message( paste( 'data successfully read and split into', N_split, 'chunks'))
 
-
+#inverse distance calculation function
 inv_distancer <-
   function( n,
             source.sf,
@@ -159,7 +151,6 @@ inv_distancer <-
   }
 
 # apply the function to each source
-
 # if you want to do it fast (in parallel using all cores and with a progress bar, use pbmclapply
 
 exp_inverse_dist <-
@@ -170,17 +161,10 @@ exp_inverse_dist <-
       receptor.sf = fishnet.sf) %>%
     rbindlist
 
-# define a file name, save the output
-# filename.out <- paste0( './data/exp_inverse_dist_', array_num, '.csv')
-# fwrite( exp_inverse_dist ,
-#         filename.out)
 
-
-# save(exp_inverse_dist , file=paste0("./data/exp_inverse_dist_",array_num,".RData"))
-
-# # ## =============================================================
-# # # 5. sum exposure across sources
-# # ## =============================================================
+#  =============================================================
+# 5. sum exposure across sources
+# =============================================================
 exp_inverse_dist_all <-
   exp_inverse_dist[, .( exposure = sum( inv_dist)),
            by = c("ID_recept", "Type")]
@@ -192,7 +176,6 @@ exp_inverse_dist_all.sf <-
          by = 'ID_recept')
 
 save(exp_inverse_dist_all.sf , file=paste0('./data/inverse_distance_data/exp_inverse_dist_',array_num,'.RData'))
-
 
 
 # =========================================================================================
@@ -208,7 +191,7 @@ all.idwe <- idwe %>%
 
 
 
-# # plot the exposure
+# # plot the idwe exposure
 
 unique(all.idwe$Type)
 
