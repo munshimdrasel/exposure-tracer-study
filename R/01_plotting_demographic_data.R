@@ -2,10 +2,8 @@
 
 library(fst)
 library( sf)
-library( raster)
 library( data.table)
 library( ggplot2)
-library(tidycensus, quietly = TRUE)
 library(tidyverse)
 library(tigris, quietly = TRUE)
 library(viridis, quietly = TRUE)
@@ -14,35 +12,31 @@ library(scales, quietly = TRUE)
 library( fasterize)
 library( USAboundaries)
 library( magrittr)
-library( raster)
-library( ncdf4)
-options(tigris_use_cache = TRUE)
-options(tigris_class = "sf")
 
 
 #working directory on my PC
-# setwd ("/Users/munshirasel/Library/CloudStorage/GoogleDrive-munshimdrasel@gwmail.gwu.edu/My Drive/R/exposure-tracer-study")
+setwd ("/Users/munshirasel/Library/CloudStorage/GoogleDrive-munshimdrasel@gwmail.gwu.edu/My Drive/R/exposure-tracer-study")
 
 #working directory on Hopper cluster
-setwd ("/projects/HAQ_LAB/mrasel/R/exposure-tracer-study")
+# setwd ("/projects/HAQ_LAB/mrasel/R/exposure-tracer-study")
 
 #demographic variables list
 # https://api.census.gov/data/2020/acs/acs5/variables.html
 
-#on hopper demographic data 
+# reading demographic data 
 
 load ("./data/demographic_data/combined.pop.income.block.groups.2013.2019.RData")
 
 
 demo.combined <- combined.years %>% separate(NAME, c("block_group", "tract", "county", "state" ), ",") 
 
-#removing first blank space
+#removing first blank space of following columns
 demo.combined$state <- sub('.', '', demo.combined$state)
 demo.combined$county <- sub('.', '', demo.combined$county)
 demo.combined$tract <- sub('.', '', demo.combined$tract)
 demo.combined$block_group <- sub('.', '', demo.combined$block_group)
 
-#getting texas data
+#getting texas data only
 tx.pop.income <- demo.combined%>% filter(state=="Texas")
 
 #removing county last 7 characters
@@ -59,7 +53,6 @@ pick_county = c ("Atascosa", "Austin", "Bastrop", "Bee", "Brazos", "Burleson", "
 #converting wide data into long data
 block.group.pop<-tx.pop.income %>% as.data.frame() %>% filter(county %in% pick_county) %>% 
   dplyr::select(-GEOID, -block_group, -tract, -county, -state, WhiteE, HispanicE, BlackE, AsianE, geometry)
-
 block.group.pop<-melt(block.group.pop, id.vars=c("year", "geometry"), variable.name = "group")
 
 #selecting selected groups White, Hispanic, Black, Asian
