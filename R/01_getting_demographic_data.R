@@ -19,10 +19,10 @@ options(tigris_use_cache = TRUE)
 options(tigris_class = "sf")
 
 #working directory on my PC
-# setwd ("/Users/munshirasel/Library/CloudStorage/GoogleDrive-munshimdrasel@gwmail.gwu.edu/My Drive/R/exposure-tracer-study")
+setwd ("/Users/munshirasel/Library/CloudStorage/GoogleDrive-munshimdrasel@gwmail.gwu.edu/My Drive/R/exposure-tracer-study")
 
 #working directory on Hopper cluster
-setwd ("/projects/HAQ_LAB/mrasel/R/exposure-tracer-study")
+# setwd ("/projects/HAQ_LAB/mrasel/R/exposure-tracer-study")
 
 #demographic variables list
 # https://api.census.gov/data/2020/acs/acs5/variables.html
