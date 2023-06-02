@@ -25,9 +25,11 @@ module load gnu10/10.3.0
 module load openmpi
 module load netcdf-c
 module load r/4.1.2-dx
-#module load r-disperseR/0.1.0
+
+
+#going to R script directory
+cd /projects/HAQ_LAB/mrasel/R/exposure-tracer-study/R/
 
 ## Run your program or script
-cd /projects/HAQ_LAB/mrasel/R/exposure-tracer-study/R/
 Rscript ./inverse_distance.R   
 
