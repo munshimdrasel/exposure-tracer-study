@@ -16,7 +16,7 @@ library( magrittr)
 #working directory on my PC
 setwd ("/Users/munshirasel/Library/CloudStorage/GoogleDrive-munshimdrasel@gwmail.gwu.edu/My Drive/R/exposure-tracer-study")
 
-#working directory on Hopper cluster
+#working directory on GMU Hopper cluster
 # setwd ("/projects/HAQ_LAB/mrasel/R/exposure-tracer-study")
 
 # steps:
@@ -52,8 +52,9 @@ well.data <- read.csv("./data/FracTrackerNationalWellFile_2021/FracTrackerNation
 # removing duplicated rows
 well.data <- well.data %>% distinct()
 
+
 oil.gas.well <- well.data #%>% filter( Type %in% c("Storage from Oil / Gas"))
-oil.gas.well$ID <- 1:nrow(oil.gas.well)
+oil.gas.well$ID <- 1:nrow(oil.gas.well) #assigning each grid cell as one unique ID 
 
 link_locations <- oil.gas.well
 
@@ -69,13 +70,16 @@ box_use <- c( xmin = -101,
               ymin = 25,
               ymax = 30)
 
+#getting Texas's boundary data
 tx.sf <- USAboundaries::us_states( states = 'Texas') #%>%st_transform( crs = p4s)
 
 # we want to use an equal area projection, here's one I often use:
 p4s <- "+proj=lcc +lat_1=33 +lat_2=45 +lat_0=40 +lon_0=-97 +a=6370000 +b=6370000"
 
+# cropping over Eagle Ford Shale Area in Texas
 tx_crop.sf <- st_crop( tx.sf, box_use) %>%st_transform( crs = p4s)
 
+#cropping wells data over Eagle Ford Shale area, TX
 well_locations_crop.sf <- st_crop(link_locations.sf, box_use) # %>% st_transform(crs=p4s)
 
 
@@ -94,7 +98,7 @@ fishnet.sf <-
 # define a receptor ID
 fishnet.sf$ID_recept <- 1:nrow( fishnet.sf)
 
-#Running a batch job on Hopper cluster
+#Running an array batch job on Hopper cluster
 
 #loading netcdf library path on hopper
 dyn.load("/opt/ohpc/pub/mpi/openmpi4-gnu9/4.0.4/lib/libmpi.so.40")
@@ -110,7 +114,7 @@ N_split <- 50
 nrows <- nrow( well_locations_crop.sf )
 nrows_split <- split( 1:nrows, rep_len( 1:N_split, nrows))
 
-# select the rows that correspont to this array number
+# select the rows that correspond to this array number
 nrows_use <- nrows_split[[array_num]]
 
 link_locations.sf.trans <- well_locations_crop.sf[nrows_use,] 
@@ -186,6 +190,7 @@ save(exp_inverse_dist_all.sf , file=paste0('./data/inverse_distance_data/exp_inv
 idwe <- list.files( "./data/inverse_distance_data",  pattern = 'exp_inverse_dist_*',
                       full.names = TRUE)
 
+#reading exposure data from idwe files
 all.idwe <- idwe %>%
   map_df(~ get(load(file = .x)))
 
